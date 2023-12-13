@@ -17,8 +17,8 @@ fullnameOverride: ""
 podAnnotations: {}
 podLabels: {}
 
-podSecurityContext: {}
-  # fsGroup: 2000
+podSecurityContext:
+  fsGroup: 1000
 
 # Available values:
   # AUTOPAUSE: true # -- pause game when no player is connected
@@ -37,38 +37,19 @@ podSecurityContext: {}
   # SERVERQUERYPORT: 15777 # -- set the game's query port
   # SKIPUPDATE: false # -- avoid updating the game on container start/restart
   # STEAMBETA: false # -- set experimental game version
+  # ROOTLESS: true # needs to be set to run rootless
 env:
-  - name: AUTOPAUSE
-    value: "false"
-  - name: AUTOSAVEINTERVAL
-    value: "300"
-  - name: AUTOSAVENUM
-    value: "3"
-  - name: AUTOSAVEONDISCONNECT
-    value: "true"
-  # disable updates, mostly breaking changes after new update
-  - name: SKIPUPDATE
-    value: "true"
-  - name: MAXPLAYERS
-    value: "4"
-  - name: TZ
-    value: "Europe/Berlin"
-  - name: CRASHREPORT
-    value: "false"
-  - name: PGID
-    value: "1000"
-  - name: PUID
-    value: "1000"
-  - name: ROOTLESS
-    value: "true"
+  #- name: AUTOPAUSE
+  #  value: "false"
+  # ...
 
-# Error message: usermod: failure while writing changes to /etc/gshadow
 securityContext:
   allowPrivilegeEscalation: false
   capabilities:
     drop:
     - ALL
-  readOnlyRootFilesystem: true
+  # needs to be set to false that steamcmd can write to /home/steam
+  readOnlyRootFilesystem: false
   runAsNonRoot: true
   runAsUser: 1000
   runAsGroup: 1000
@@ -76,9 +57,10 @@ securityContext:
     type: RuntimeDefault
 
 service:
-  type: LoadBalancer
+  # NodePort, LoadBalancer
+  type: NodePort
   externalIPs:
-    - 195.90.201.67
+  #  - 192.168.178.0
   ports:
     - name: beacon-port
       port: 15000
@@ -94,10 +76,7 @@ service:
       protocol: UDP
 
 resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # Recent updates consume 4GB - 6GB RAM, but the official wiki (https://satisfactory.wiki.gg/wiki/Dedicated_servers#Requirements) recommends allocating 12GB - 16GB RAM.
   # limits:
   #   cpu: 500m
   #   memory: 16Gi
