@@ -62,8 +62,6 @@ spec:
             sizeLimit: {{ $value.size}}
           {{ end }}
         {{- end }}
-        - name: steam
-          emptyDir: {}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
