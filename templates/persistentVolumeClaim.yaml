@@ -1,0 +1,16 @@
+{{- range $value := .Values.persistence}}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  {{- with $value.annotations}}
+  annotations: {{toYaml .| nindent 4 }}
+  {{- end }}
+  name: {{ include "satisfactory.fullname" $ }}-{{$value.name}}
+spec:
+  accessModes: {{ $value.accessModes | toYaml | nindent 2 }}
+  storageClassName: {{ $value.storageClass }}
+  resources:
+    requests:
+      storage: {{ $value.size }}
+{{- end }}
