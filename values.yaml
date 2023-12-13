@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: wolveix/satisfactory-server
+  repository:  ghcr.io/98jan/satisfactory-server/satisfactory-server #wolveix/satisfactory-server
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
@@ -13,18 +13,6 @@ image:
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
-
-# ToDo: check if serviceAccount is really needed
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: false
-  # Automatically mount a ServiceAccount's API credentials?
-  automount: true
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
 
 podAnnotations: {}
 podLabels: {}
@@ -71,17 +59,19 @@ env:
     value: "1000"
   - name: PUID
     value: "1000"
+  - name: ROOTLESS
+    value: "true"
 
 # Error message: usermod: failure while writing changes to /etc/gshadow
 securityContext:
   allowPrivilegeEscalation: false
-  #capabilities:
-  #  drop:
-  #  - ALL
-  #readOnlyRootFilesystem: true
-  #runAsNonRoot: true
-  #runAsUser: 1000
-  #runAsGroup: 1000
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
   seccompProfile:
     type: RuntimeDefault
 
