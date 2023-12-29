@@ -58,7 +58,7 @@ spec:
               value: {{ .Values.postgresql.postgresqlUsername }}
             {{- end }}
             {{- with .Values.apiserver.env }}
-            {{- toYaml . | nindent 8 }}
+            {{- toYaml . | nindent 12 }}
             {{- end }}
           ports:
             - name: api

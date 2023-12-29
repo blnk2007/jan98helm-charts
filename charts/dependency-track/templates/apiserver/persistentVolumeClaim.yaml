@@ -4,10 +4,10 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  {{- with $value.annotations}}
+  {{- with $value.annotations }}
   annotations: {{toYaml .| nindent 4 }}
   {{- end }}
-  name: {{ include "dependency-track.apiserver.fullname" $ }}-{{$value.name}}
+  name: {{ include "dependency-track.apiserver.fullname" $ }}-{{ $value.name }}
 spec:
   accessModes: {{ $value.accessModes | toYaml | nindent 2 }}
   storageClassName: {{ $value.storageClass }}
