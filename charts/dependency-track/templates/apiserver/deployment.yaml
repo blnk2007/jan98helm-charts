@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "dependency-track.apiserver.fullname" $ }}-apiserver
+  labels:
+    {{- include "dependency-track.apiserver.labels" . | nindent 8 }}
+  {{- with .Values.apiserver.annotations }}
+  annotations: {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.apiserver.replicaCount }}
+  # ToDo: check on how that can be implemented
+  #{{/*- if .Values.apiserver.persistence.enabled */}}
+  #strategy:
+  #  type: Recreate
+  #{{/*- end */}}
+  selector:
+    matchLabels: {{- include "dependency-track.apiserver.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "dependency-track.apiserver.labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets: {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- if .Values.apiserver.serviceAccount.create}}
+      serviceAccountName: {{ include "dependency-track.apiserver.fullname" $ }}-apiserver
+      {{- end }}
+      securityContext: {{- toYaml .Values.apiserver.podSecurityContext | nindent 8 }}
+      {{- with .Values.apiserver.initContainers }}
+      initContainers: {{- toYaml . | nindent 6 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}-apiserver
+          securityContext: {{- toYaml .Values.apiserver.securityContext | nindent 12 }}
+          image: {{ .Values.apiserver.image.repository }}
+          imagePullPolicy: {{ .Values.apiserver.image.pullPolicy }}
+          {{- with .Values.apiserver.resources }}
+          resources: {{ . | toYaml | nindent 12 }}
+          {{- end }}
+          env:
+            - name: ALPINE_DATA_DIRECTORY
+              value: "/data"
+            {{- if .Values.postgresql.enabled }}
+            - name: ALPINE_DATABASE_MODE
+              value: "external"
+            - name: ALPINE_DATABASE_DRIVER
+              value: "org.postgresql.Driver"
+            - name: ALPINE_DATABASE_URL
+              value: jdbc:postgresql://{{ .Release.Name }}-postgresql/{{ .Values.postgresql.postgresqlDatabase }}
+            - name: ALPINE_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-postgresql
+                  key: postgresql-password
+            - name: ALPINE_DATABASE_USERNAME
+              value: {{ .Values.postgresql.postgresqlUsername }}
+            {{- end }}
+            {{- with .Values.apiserver.env }}
+            {{- toYaml . | nindent 8 }}
+            {{- end }}
+          ports:
+            - name: api
+              containerPort: 8080
+              protocol: TCP
+          {{- if .Values.apiserver.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              port: api
+              path: {{ .Values.apiserver.livenessProbe.path }}
+            initialDelaySeconds: {{ .Values.apiserver.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.apiserver.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.apiserver.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.apiserver.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.apiserver.livenessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.apiserver.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              port: api
+              path: {{ .Values.apiserver.readinessProbe.path }}
+            initialDelaySeconds: {{ .Values.apiserver.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.apiserver.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.apiserver.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.apiserver.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.apiserver.readinessProbe.failureThreshold }}
+          {{- end }}
+          volumeMounts:
+            {{- range $value := .Values.apiserver.persistence }}
+            {{- if $value.enabled }}
+            - name: {{ include "dependency-track.apiserver.fullname" $ }}-{{ $value.name }}
+              mountPath: {{ $value.mountPath }}
+            {{ end }}
+            {{- end }}
+      {{- with .Values.apiserver.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.apiserver.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.apiserver.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        {{- range $value := .Values.apiserver.persistence }}
+        - name: {{ include "dependency-track.apiserver.fullname" $ }}-{{ $value.name }}
+        {{- if $value.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "dependency-track.apiserver.fullname" $ }}-{{ $value.name }}
+        {{- else }}
+          emptyDir:
+            sizeLimit: {{ $value.size }}
+        {{- end }}
+        {{- end }}
