@@ -25,7 +25,7 @@ spec:
       imagePullSecrets: {{- toYaml . | nindent 6 }}
       {{- end }}
       {{- if .Values.apiserver.serviceAccount.create}}
-      serviceAccountName: {{ include "dependency-track.apiserver.fullname" $ }}-apiserver
+      serviceAccountName: {{ .Values.apiserver.serviceAccount.name }}
       {{- end }}
       securityContext: {{- toYaml .Values.apiserver.podSecurityContext | nindent 8 }}
       {{- with .Values.apiserver.initContainers }}
