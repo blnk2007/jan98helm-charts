@@ -53,7 +53,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ .Release.Name }}-postgresql
-                  key: postgresql-password
+                  key: postgres-password
             - name: ALPINE_DATABASE_USERNAME
               value: {{ .Values.postgresql.postgresqlUsername }}
             {{- end }}

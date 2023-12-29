@@ -134,7 +134,8 @@ apiserver:
     fsGroup: 1000
   securityContext:
     allowPrivilegeEscalation: false
-    readOnlyRootFilesystem: true
+    # needs to be false, so that dependencyTrack can write to root filesystem
+    readOnlyRootFilesystem: false
     runAsGroup: 1000
     runAsNonRoot: true
     runAsUser: 1000
