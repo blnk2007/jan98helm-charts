@@ -5,7 +5,7 @@ description: |
 name: dependency-track
 home: https://dependencytrack.org/
 version: 0.0.5
-icon: https://raw.githubusercontent.com/DependencyTrack/branding/master/dt-logo-black-text.svg
+icon: https://raw.githubusercontent.com/DependencyTrack/dependency-track/master/docs/images/dt-logo.svg
 keywords:
   - security
   - dependency
