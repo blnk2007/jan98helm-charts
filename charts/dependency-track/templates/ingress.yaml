@@ -41,14 +41,14 @@ spec:
               service:
                 name: {{ include "dependency-track.apiserver.fullname" . }}-apiserver
                 port:
-                  number: 80
+                  number: 8080
           - path: /mirror
             pathType: Prefix
             backend:
               service:
                 name: {{ include "dependency-track.apiserver.fullname" . }}-apiserver
                 port:
-                  number: 80
+                  number: 8080
           - path: /
             pathType: Prefix
             backend:

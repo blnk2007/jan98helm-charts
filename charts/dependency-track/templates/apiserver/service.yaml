@@ -7,9 +7,9 @@ metadata:
 spec:
   type: {{ .Values.apiserver.service.type }}
   ports:
-    - port: {{ .Values.apiserver.service.port }}
-      targetPort: http
+    - port: {{ .Values.apiserver.service.port }}80
+      targetPort: api
       protocol: TCP
-      name: http
+      name: api
   selector:
     {{- include "dependency-track.apiserver.selectorLabels" . | nindent 4 }}
