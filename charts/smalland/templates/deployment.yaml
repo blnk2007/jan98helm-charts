@@ -45,7 +45,6 @@ spec:
           volumeMounts:
             - name: {{ include "smalland.fullname" . }}-config
               mountPath: /opt/smalland/SMALLAND/Saved
-      {{- with .Values.volumes }}
       volumes:
         {{- range $value := .Values.persistence }}
         - name: {{ include "smalland.fullname" $ }}-{{ $value.name }}
@@ -57,7 +56,6 @@ spec:
             sizeLimit: {{ $value.size}}
           {{ end }}
         {{- end }}
-      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
