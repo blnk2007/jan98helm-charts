@@ -43,11 +43,13 @@ spec:
               protocol: UDP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.env }}
-          env: {{- toYaml . | nindent 10 }}
-          {{- end }}
+          env:
             - name: PORT
               value: {{ .Values.service.port }}
+            {{- range $value := .Values.env }}
+            - name: {{ $value.name }}
+              value: {{ $value.value }}
+            {{- end }}
           volumeMounts:
             - name: {{ include "smalland.fullname" . }}-config
               mountPath: /opt/smalland/SMALLAND/Saved
