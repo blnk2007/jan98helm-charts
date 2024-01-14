@@ -6,6 +6,8 @@ metadata:
     {{- include "smalland.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       {{- include "smalland.selectorLabels" . | nindent 6 }}
