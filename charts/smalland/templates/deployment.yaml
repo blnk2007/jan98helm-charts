@@ -28,6 +28,7 @@ spec:
       serviceAccountName: {{ include "smalland.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      hostNetwork: {{ .Values.hostNetwork }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -35,13 +36,16 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            {{- range $value := .Values.service.ports }}
-            - name: {{ $value.name }}
-              containerPort: {{ $value.targetPort }}
-              protocol: {{ $value.protocol }}
-            {{- end }}
+            - name: game-port
+              containerPort: {{ .Values.service.port }}
+              protocol: UDP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.env }}
+          env: {{- toYaml . | nindent 10 }}
+          {{- end }}
+            - name: PORT
+              value: {{ .Values.service.port }}
           volumeMounts:
             - name: {{ include "smalland.fullname" . }}-config
               mountPath: /opt/smalland/SMALLAND/Saved

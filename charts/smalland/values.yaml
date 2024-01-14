@@ -25,6 +25,25 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
+# configure environment variables if needed:
+env: {}
+  #- name: SKIPUPDATE
+  #  value: "false"
+  #- name: TZ
+  #  value: "Europe/Berlin"
+  #- name: PGID
+  #  value: "1000"
+  #- name: PUID
+  #  value: "1000"
+  #- name: WORLDNAME
+  #  value: "98jan Cluster"
+  #- name: SERVERNAME
+  #  value: "98jan Cluster"
+  #- name: PASSWORD
+  #  value: "beautyPassword"
+  #- name: SERVERIP
+  #  value: 0.0.0.0
+
 podAnnotations: {}
 podLabels: {}
 
@@ -44,6 +63,9 @@ securityContext:
   seccompProfile:
     type: RuntimeDefault
 
+# Smalland needs interface to bind socket to, which needs to match external IP Adress
+hostNetwork: true
+
 persistence:
   - name: config
     enabled: false
@@ -53,13 +75,11 @@ persistence:
     storageClass: ""
     size: 1Gi
 
+# depending on the port selection here an env var is created for setting the port
 service:
-  type: NodePort
-  ports:
-    - name: game-port
-      port: 7777
-      targetPort: 7777
-      protocol: UDP
+  type: ClusterIP
+  port: 7777
+  externalIPs: {}
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

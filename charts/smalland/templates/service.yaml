@@ -13,6 +13,9 @@ spec:
   {{- end }}
   {{- end }}
   ports:
-    {{- toYaml .Values.service.ports | nindent 4 }}
+    - name: game-port
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.port }}
+      protocol: UDP
   selector:
     {{- include "smalland.selectorLabels" . | nindent 4 }}
