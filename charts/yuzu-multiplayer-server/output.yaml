@@ -1,0 +1,93 @@
+---
+# Source: yuzu-multiplayer-server/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: release-name-yuzu-multiplayer-server
+  labels:
+    helm.sh/chart: yuzu-multiplayer-server-0.1.0
+    app.kubernetes.io/name: yuzu-multiplayer-server
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: LoadBalancer
+  externalIPs:
+    - 130.162.41.118
+  ports:
+    - port: 5000
+      targetPort: game
+      protocol: UDP
+      name: game
+  selector:
+    app.kubernetes.io/name: yuzu-multiplayer-server
+    app.kubernetes.io/instance: release-name
+---
+# Source: yuzu-multiplayer-server/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: release-name-yuzu-multiplayer-server
+  labels:
+    helm.sh/chart: yuzu-multiplayer-server-0.1.0
+    app.kubernetes.io/name: yuzu-multiplayer-server
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: yuzu-multiplayer-server
+      app.kubernetes.io/instance: release-name
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: yuzu-multiplayer-server-0.1.0
+        app.kubernetes.io/name: yuzu-multiplayer-server
+        app.kubernetes.io/instance: release-name
+        app.kubernetes.io/version: "1.16.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: yuzu-multiplayer-server
+          args:
+            - "--room-name"
+            - "Naj's Dedicated Yuzu Server"
+            - "--preferred-game"
+            - "Mario Kart 8"
+            - "--max_members"
+            - "2"
+            - "--port"
+            - "5000"
+            - "--token"
+            - "TmFqZW5iZXJnOmVkOWNlYWJkLTMwNzEtNDZhZS04ZWEzLWU0YTc1NDc1MTQ1ZQ"
+            - "--web-api-url"
+            - "https://api.yuzu-emu.org"
+            - "--enable-yuzu-mods"
+            - "false"
+            - "--password"
+            - "12345"
+            - "--room-description"
+            - "This is a dedicated yuzu server"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsGroup: 1000
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          image: "yuzuemu/yuzu-multiplayer-dedicated:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: game
+              containerPort: 5000
+              protocol: UDP
+          resources:
+            {}
