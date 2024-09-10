@@ -13,6 +13,13 @@ spec:
   {{- end }}
   {{- end }}
   ports:
-    {{- toYaml .Values.service.ports | nindent 4 }}
+    - port: {{ .Values.service.port }}
+      targetPort: game-tcp
+      protocol: TCP
+      name: game-tcp
+    - port: {{ .Values.service.port }}
+      targetPort: game-udp
+      protocol: UDP
+      name: game-udp
   selector:
     {{- include "satisfactory.selectorLabels" . | nindent 4 }}

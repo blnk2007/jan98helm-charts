@@ -32,10 +32,8 @@ Recent updates consume 4GB - 6GB RAM, but [the official wiki](https://satisfacto
 | `PGID`                  |  `1000`   | set the group ID of the user the server will run as |
 | `PUID`                  |  `1000`   | set the user ID of the user the server will run as  |
 | `ROOTLESS`              |  `false`  | run the container as a non-root user                |
-| `SERVERBEACONPORT`      |  `15000`  | set the game's beacon port                          |
 | `SERVERGAMEPORT`        |  `7777`   | set the game's port                                 |
 | `SERVERIP`              | `0.0.0.0` | set the game's ip (usually not needed)              |
-| `SERVERQUERYPORT`       |  `15777`  | set the game's query port                           |
 | `SKIPUPDATE`            |  `false`  | avoid updating the game on container start/restart  |
 | `STEAMBETA`             |  `false`  | set experimental game version                       |
 | `TIMEOUT`               |   `30`    | set client timeout (in seconds)                     |
@@ -53,3 +51,119 @@ The [Satisfactory Wiki](https://satisfactory.wiki.gg/wiki/Multiplayer#Engine.ini
 -   Copy the config data from the wiki into the respective files
 -   Right-click each of the 3 config files (Engine.ini, Game.ini, Scalability.ini)
 -   Go to Properties > tick Read-only under the attributes
+
+## Restrict network accessibility with Network Policies
+As I am using cilium as my Kubernetes CNI, I will provide here an example of NetworkPolicies to restrict satisfactory's network communication:
+
+The domain "telemetry.deparc.net" is disabled by default and traffic is blocked, so far no impact on the server could be seen.
+
+ToDo: add NetworkPolicies as optional
+
+```YAML
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: default-deny
+  namespace: satisfactory
+spec:
+  description: "Block all the traffic (except DNS) by default"
+  ingress:
+    - {}
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: '53'
+              protocol: UDP
+          rules:
+            dns:
+              - matchPattern: '*'
+  endpointSelector:
+    matchExpressions:
+      - key: io.kubernetes.pod.namespace
+        operator: NotIn
+        values:
+          - kube-system
+---
+# allow ingress from world to 7777
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-ingress-from-world
+  namespace: satisfactory
+spec:
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.policy.serviceaccount: default
+  ingress:
+    - fromEntities:
+        - "world"
+      toPorts:
+        - ports:
+            - port: "7777"
+              protocol: TCP
+            - port: "7777"
+              protocol: UDP
+---
+# allow egress to world from 7777
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-egress-to-world
+  namespace: satisfactory
+spec:
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.policy.serviceaccount: default
+  egress:
+    - toEntities:
+      - "world"
+      toPorts:
+        - ports:
+            - port: "7777"
+              protocol: TCP
+            - port: "7777"
+              protocol: UDP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-egress-to-steam
+  namespace: satisfactory
+spec:
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.policy.serviceaccount: default
+  egress:
+    - toFQDNs:
+        - matchName: media.steampowered.com
+        - matchName: test.steampowered.com
+        - matchName: clientconfig.akamai.steamstatic.com
+      toPorts:
+        - ports:
+            - port: "80"
+    - toFQDNs:
+        - matchName: cdn.steamstatic.com
+        - matchName: api.steampowered.com
+        - matchName: steampipe.akamaized.net
+        - matchName: api.ipify.org
+        - matchPattern: "*.steamcontent.com"
+      toPorts:
+        - ports:
+            - port: "443"
+    # https://help.steampowered.com/en/faqs/view/2EA8-4D75-DA21-31EB#:~:text=The%20following%20are%20ports%20you,UDP%20remote%20port%2027015%2D27050
+    - toFQDNs:
+        - matchPattern: "*.steamserver.net"
+      toPorts:
+          - ports:
+              - port: "443"
+              - port: "27015"
+                protocol: TCP
+                endPort: 27050
+              - port: "27015"
+                protocol: UDP
+                endPort: 27050
+```

@@ -31,10 +31,8 @@ podSecurityContext:
 # MAXPLAYERS: 4 # -- set the player limit for your server
 # PGID: 1000 # -- set the group ID of the user the server will run as
 # PUID: 1000 # -- set the user ID of the user the server will run as
-# SERVERBEACONPORT: 15000 # -- set the game's beacon port
 # SERVERGAMEPORT: 7777 # -- set the game's port
 # SERVERIP: 0.0.0.0    # -- set the game's ip (usually not needed)
-# SERVERQUERYPORT: 15777 # -- set the game's query port
 # SKIPUPDATE: false # -- avoid updating the game on container start/restart
 # STEAMBETA: false # -- set experimental game version
 # ROOTLESS: true # needs to be set to run rootless
@@ -63,19 +61,8 @@ service:
   # ExternalIP can be added if LoadBalancer as type is used
   #externalIPs:
   #  - 192.168.178.0
-  ports:
-    - name: beacon-port
-      port: 15000
-      targetPort: 15000
-      protocol: UDP
-    - name: game-port
-      port: 7777
-      targetPort: 7777
-      protocol: UDP
-    - name: query-port
-      port: 15777
-      targetPort: 15777
-      protocol: UDP
+  port: 7777
+
 
 resources: {}
   # Recent updates consume 4GB - 6GB RAM, but the official wiki (https://satisfactory.wiki.gg/wiki/Dedicated_servers#Requirements) recommends allocating 12GB - 16GB RAM.
@@ -85,6 +72,9 @@ resources: {}
   # requests:
   #   cpu: 500m
   #   memory: 12Gi
+
+strategy: {}
+  # type: Recreate
 
 autoscaling:
   enabled: false
