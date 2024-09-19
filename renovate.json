@@ -19,7 +19,7 @@
       "packageNames": ["wolveix/satisfactory-server"],
       "matchManagers": ["regex"],
       "matchStrings": [
-        "version: \"v?(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+        "^version: \"v?(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
       ],
       "extractVersion": "^v?(?<version>\\d+\\.\\d+\\.\\d+)$",
       "versioning": "semver"
