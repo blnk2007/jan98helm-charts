@@ -10,7 +10,7 @@
       "datasourceTemplate": "docker",
       "fileMatch": ["(^|/)Chart\\.yaml$"],
       "matchStrings": [
-        "#\\s?renovate: image=(?<depName>.*?)\\s?(appVersion|version):\\s?\\\"?(?<currentValue>[\\w+\\.\\-]*)\""
+        "#\\s?renovate: image=(?<depName>.*?)\\s?(version):\\s?\\\"?(?<currentValue>[\\w+\\.\\-]*)\""
       ]
     }
   ],
@@ -18,9 +18,6 @@
     {
       "packageNames": ["wolveix/satisfactory-server"],
       "matchManagers": ["regex"],
-      "matchStrings": [
-        "^version: \"v?(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
-      ],
       "extractVersion": "^v?(?<version>\\d+\\.\\d+\\.\\d+)$",
       "versioning": "semver"
     }
