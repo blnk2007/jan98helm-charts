@@ -23,7 +23,7 @@
         "version: \"v?(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
       ],
       "extractVersion": "^v?(?<version>\\d+\\.\\d+\\.\\d+)$",
-      "replaceVersion": "$<version>"
+      "versioning": "semver"
     }
   ]
 }
