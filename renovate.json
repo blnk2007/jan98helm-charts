@@ -13,5 +13,17 @@
         "#\\s?renovate: image=(?<depName>.*?)\\s?(appVersion|version):\\s?\\\"?(?<currentValue>[\\w+\\.\\-]*)\""
       ]
     }
+  ],
+  "packageRules": [
+    {
+      "packageNames": ["wolveix/satisfactory-server"],
+      "files": ["Chart.yaml"],
+      "matchManagers": ["helm"],
+      "matchStrings": [
+        "version: \"v?(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+      ],
+      "extractVersion": "^v?(?<version>\\d+\\.\\d+\\.\\d+)$",
+      "replaceVersion": "$<version>"
+    }
   ]
 }
