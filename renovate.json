@@ -4,7 +4,6 @@
     "config:recommended",
     "customManagers:helmChartYamlAppVersions"
   ],
-  {
   "customManagers": [
     {
       "customType": "regex",
@@ -15,5 +14,4 @@
       ]
     }
   ]
-}
 }
