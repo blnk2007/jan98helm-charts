@@ -17,7 +17,6 @@
   "packageRules": [
     {
       "packageNames": ["wolveix/satisfactory-server"],
-      "files": ["Chart.yaml"],
       "matchManagers": ["regex"],
       "matchStrings": [
         "version: \"v?(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
