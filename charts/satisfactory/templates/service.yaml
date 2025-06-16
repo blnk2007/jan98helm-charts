@@ -21,5 +21,13 @@ spec:
       targetPort: game-udp
       protocol: UDP
       name: game-udp
+    {{- if .Values.service.extraPorts }}
+    {{- range .Values.service.extraPorts }}
+    - port: {{ .port }}
+      targetPort: {{ .targetPort }}
+      protocol: {{ .protocol | default "TCP" }}
+      name: {{ .name }}
+    {{- end }}
+    {{- end }}
   selector:
     {{- include "satisfactory.selectorLabels" . | nindent 4 }}
