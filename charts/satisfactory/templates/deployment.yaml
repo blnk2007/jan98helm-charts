@@ -23,9 +23,9 @@ spec:
       {{- end }}
       labels:
         {{- include "satisfactory.labels" . | nindent 8 }}
-	{{- with .Values.podLabels }}
+      {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
-        {{- end }}
+      {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -46,6 +46,13 @@ spec:
             - name: game-udp
               containerPort: {{ .Values.service.port }}
               protocol: UDP
+            {{- if .Values.service.extraPorts }}
+            {{- range .Values.service.extraPorts }}
+            - name: {{ .name }}
+              containerPort: {{ .targetPort }}
+              protocol: {{ .protocol | default "TCP" }}
+            {{- end }}
+            {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- with .Values.env }}
