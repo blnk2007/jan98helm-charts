@@ -62,6 +62,11 @@ service:
   #externalIPs:
   #  - 192.168.178.0
   port: 7777
+  extraPorts:
+    - name: extra-tcp
+      port: 8888
+      targetPort: 8888
+      protocol: TCP
 
 
 resources: {}
@@ -105,3 +110,17 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
