@@ -62,6 +62,7 @@ service:
   #externalIPs:
   #  - 192.168.178.0
   port: 7777
+  extraPortsEnabled: false
   extraPorts:
     - name: extra-tcp
       port: 8888

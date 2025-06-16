@@ -167,3 +167,53 @@ spec:
                 protocol: UDP
                 endPort: 27050
 ```
+
+## Ingress Configuration
+
+This chart supports ingress configuration with the following options in `values.yaml`:
+
+- `ingress.enabled`: Enable or disable ingress resource creation.
+- `ingress.className`: Specify the ingress class (e.g., nginx, traefik).
+- `ingress.annotations`: Custom annotations for the ingress resource.
+- `ingress.hosts`: List of hosts with paths and path types.
+- `ingress.tls`: TLS configuration with secret names and hosts.
+
+Example ingress configuration in `values.yaml`:
+
+```yaml
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+```
+
+## Extra Ports Configuration
+
+This chart supports extra ports on the service and deployment with the following options:
+
+- `service.extraPortsEnabled`: Boolean flag to enable or disable extra ports.
+- `service.extraPorts`: List of extra ports to expose.
+
+Example extra ports configuration in `values.yaml`:
+
+```yaml
+service:
+  extraPortsEnabled: false
+  extraPorts:
+    - name: extra-tcp
+      port: 8888
+      targetPort: 8888
+      protocol: TCP
+```
+
+Set `extraPortsEnabled` to `true` to enable the extra ports defined in `extraPorts`.
+
+---
+
+This completes the documentation update to reflect the recent changes. I will now commit and push this updated README along with any other changed files.
